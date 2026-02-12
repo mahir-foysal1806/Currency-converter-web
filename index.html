@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Currency Converter</title>
+
+<style>
+body{
+  background-color: yellow;
+  display: flex;
+  height: 100vh;
+  justify-content: center;
+  align-items: center;
+  font-family: 'Courier New', Courier, monospace;
+  margin: 0;
+}
+
+.container{
+  background-color: darkcyan;
+  color: aliceblue;
+  padding:20px;
+  border-radius: 8px;
+  text-align: center;
+  width: 350px;
+}
+
+.currency-container{
+  padding: 20px 0;
+  display: flex;
+  justify-content: space-between;
+}
+
+.currency-container select{
+  padding:10px;
+}
+
+.currency-container input{
+  border:0;
+  background: transparent;
+  font-size: 25px;
+  text-align: right;
+  color: aliceblue;
+  width: 120px;
+}
+
+.exchange-rate{
+  font-size: 16px;
+  font-weight: 600;
+}
+
+select:focus,
+input:focus{
+  outline: 0;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+    <h1>Currency Converter</h1>
+
+    <div class="currency-container">
+        <select id="currency-first">
+            <option value="AUD">AUD</option>
+            <option value="BDT">BDT</option>
+            <option value="USD" selected>USD</option>
+            <option value="CAD">CAD</option>
+            <option value="EUR">EUR</option>
+            <option value="GBP">GBP</option>
+            <option value="INR">INR</option>
+            <option value="JPY">JPY</option>
+        </select>
+        <input type="number" id="worth-first" value="1" min="0">
+    </div>
+
+    <div class="currency-container">
+        <select id="currency-second">
+            <option value="AUD">AUD</option>
+            <option value="BDT" selected>BDT</option>
+            <option value="USD">USD</option>
+            <option value="CAD">CAD</option>
+            <option value="EUR">EUR</option>
+            <option value="GBP">GBP</option>
+            <option value="INR">INR</option>
+            <option value="JPY">JPY</option>
+        </select>
+        <input type="number" id="worth-second" value="1" min="0" disabled>
+    </div>
+
+    <p class="exchange-rate" id="exchange-rate"></p>
+</div>
+
+<script>
+const currencyFirstEl = document.getElementById("currency-first");
+const worthFirstEl = document.getElementById("worth-first");
+const currencySecondEl = document.getElementById("currency-second");
+const worthSecondEl = document.getElementById("worth-second");
+const exchangeRateEl = document.getElementById("exchange-rate");
+
+function updateRate() {
+    fetch(`https://v6.exchangerate-api.com/v6/a0566c015d3dee8ac6ca2091/latest/${currencyFirstEl.value}`)
+        .then(res => res.json())
+        .then(data => {
+
+            const rate = data.conversion_rates[currencySecondEl.value];
+
+            exchangeRateEl.innerText =
+                `1 ${currencyFirstEl.value} = ${rate} ${currencySecondEl.value}`;
+
+            worthSecondEl.value =
+                (worthFirstEl.value * rate).toFixed(2);
+        })
+        .catch(() => {
+            exchangeRateEl.innerText = "Error fetching exchange rate!";
+        });
+}
+
+currencyFirstEl.addEventListener("change", updateRate);
+currencySecondEl.addEventListener("change", updateRate);
+worthFirstEl.addEventListener("input", updateRate);
+
+updateRate();
+</script>
+
+</body>
+</html>
